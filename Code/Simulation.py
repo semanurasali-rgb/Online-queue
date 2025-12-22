@@ -56,6 +56,7 @@ p_ticket_left = np.mean(sellout_positions[:, None]> positions, axis=0)
 #Tabelle um zu sehen welche Postionen in der Warteschlange welche Wahrscheinlichkeit haben noch Tickets zu bekommen
 summary_positions=[5_000,10_000,15_000,20_000,25_000,30_000,35_000,40_000,45_000,50_000,55_000,60_000,65_000,75_000]
 
+
 #Index eimal berechnen 
 summary_indices=[np.abs(positions-pos).argmin() for pos in summary_positions]
 table=pd.DataFrame({"Queue-Position":summary_positions, 
@@ -64,9 +65,11 @@ table=pd.DataFrame({"Queue-Position":summary_positions,
 table["P(Ticket verfügbar)"]=table["P(Ticket verfügbar)"].round(3)
 table["P(Kein Ticket)"]=table["P(Kein Ticket)"].round(3)
 
+
 #Nur die wichtigsten Zeilen anzeigen und nicht die ganze Tabelle (vorher schonmal ausgegeben und da war wichtigster bereich zwischen 30 und 40.000)
 important_positions = [5_000, 25_000, 30_000, 31_000, 32_000, 33_000, 34_000, 35_000, 36_000, 37_000, 38_000, 39_000, 40_000, 41_000]
 important_rows = table[table["Queue-Position"].isin(important_positions)]
+
 
 #Cutoff-Bestimmung 
 levels = [0.5, 0.25, 0.15, 0.10, 0.05, 0.01]
