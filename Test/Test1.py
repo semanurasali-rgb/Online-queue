@@ -78,7 +78,7 @@ cutoffs = {f"{int(p*100)}% Chance": positions[np.argmax(p_ticket_left < p)]for p
 
 
 #Ausgabe
-print("\n Simulation abgeschlossen")
+print("\nSimulation abgeschlossen")
 print(f"Stadion_Tickets: {TOTAL_TICKETS}")
 print(f"Simulationen: {SIMULATIONS}")
 print(f"Queue-Größe: {QUEUE_SIZE}")
@@ -95,10 +95,25 @@ for k, v in cutoffs.items():
     print(f"{k:>10} ca. {v:,}")
 
 
+#Tabelle 
+print(table)
+#davon nur die wichtigen Zahlen
+print("\nWichtige Queue-Positionen:")
+print(important_rows)
+
+
 #Wahrscheinlichkeiten besser darstellen in Diagramm
-plt.plot(positions, p_ticket_left)
-plt.xlabel("Queue-Position")
+plt.figure(figuresize=(10,6))
+plt.plot(positions/1000, p_ticket_left, label="P(Tickt verfügbar)")
+for label, v in cutoffs.items():
+    if 30_000 <= v <= 40_000:
+        plt.axvline(v/ 1000, color='red', linestyle='--', alpha=0.7)
+        plt.text(v / 1000 +0.2, 0.05, label, rotation=90, color='red', fontsize=8)
+plt.xlabel("Queue-Position (in Tausend)")
 plt.ylabel("P(Ticket verfügbar)")
 plt.title("Wahrscheinlichkeit, dass noch Tickets verfügbar sind")
 plt.grid (True)
 plt.savefig("plot.png")
+plt.show()
+
+print("Simulation komplett abgeschlossen")
