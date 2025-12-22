@@ -1,0 +1,11 @@
+def run_single_simulation():
+    tickets_left = TOTAL_TICKETS
+
+    for person in range (QUEUE_SIZE):
+        demand = ticket_demand()
+        tickets_left -= demand
+
+        if tickets_left <= 0:
+            return person
+
+    return QUEUE_SIZE
