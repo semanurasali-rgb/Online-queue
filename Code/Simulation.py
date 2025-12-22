@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt
 
-
+print("Programm fängt an durchzulaufen")
 #Parameter 
 TOTAL_TICKETS=75_000
 QUEUE_SIZE=400_000
