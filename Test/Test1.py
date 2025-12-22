@@ -25,25 +25,25 @@ weights=1/np.sqrt(ticket_value)
 weights/= weights.sum()
 
 
-#Einzelne Simulation
-def run_single_simulation():
-    tickets_left=TOTAL_TICKETS
-    for person in range(QUEUE_SIZE):
-        #entscheidet ob Person Tickets kauft
-        if rng.random()<P_ZERO:
-            demand=0
-        else:
-            demand=rng.choice(ticket_value, p=weights)
-        tickets_left -=demand
-        #Tickets sind aufgebraucht
-        if tickets_left<0:
-            #letzte Person die noch ein Ticket bekommt
-            return person
-    return QUEUE_SIZE
+#Einzelne Simulation - Vektorisiert
+def run_single_simulation_vectorized(): 
+    # Zufällige Nachfrage für alles Personen generieren
+    demands = rng.choice(ticket_value, size=QUEUE_SIZE, p=weights)
+
+    #5% Chance, dass jemand nicht kauft
+    zeros = rng.random(size=QUEUE_SIZE) < P_ZERO
+    demands [zeros] = 0
+
+    # Kumlierte Summe berechnen 
+    cumsum = np.cumsum(demands)
+
+    #Position finden, an der Tickets alle weg sind 
+    sellout_idx = np.searchsorted(cumsum, TOTAL_TICKETS, side='right')
+    return sellout_idx
 
 
-#Monte-Carlo-Simulation
-sellout_positions=np.array([run_single_simulation()for _ in range(SIMULATIONS)])
+#Monte-Carlo-Simulation (vektorisiert pro Simulation)
+sellout_positions=np.array([run_single_simulation_vectorized()for _ in range(SIMULATIONS)])
 
 
 #Wahrscheinlichkeit pro Queue-Position mit Schrittweite von 100
@@ -77,6 +77,7 @@ levels = [0.5, 0.25, 0.15, 0.10, 0.05, 0.01]
 cutoffs = {f"{int(p*100)}% Chance": positions[np.argmax(p_ticket_left < p)]for p in levels}
 
 
+#Ausgabe
 print("\n Simulation abgeschlossen")
 print(f"Stadion_Tickets: {TOTAL_TICKETS}")
 print(f"Simulationen: {SIMULATIONS}")
