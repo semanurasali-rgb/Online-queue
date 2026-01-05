@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 print("Programm fängt an durchzulaufen")
 
 #Parameter 
-TOTAL_TICKETS=75_000
-QUEUE_SIZE=400_000
-SIMULATIONS=3_000
+TOTAL_TICKETS=75#000
+QUEUE_SIZE=400#_000
+SIMULATIONS=3#000
 TICKET_VALUES=[1,2,3,4]
 #Wahrscheinlichkeit für 0 Tickets 
 P_ZERO=0.05
