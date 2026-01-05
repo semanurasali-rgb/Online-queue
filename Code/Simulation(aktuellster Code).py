@@ -76,7 +76,7 @@ important_rows = table[table["Queue-Position"].isin(important_positions)]
 levels = [0.5, 0.25, 0.15, 0.10, 0.05, 0.01]
 cutoffs = {f"{int(p*100)}% Chance": positions[np.argmax(p_ticket_left < p)]for p in levels}
 
-
+#Ergebnisse Ausgeben
 print("\n Simulation abgeschlossen")
 print(f"Stadion_Tickets: {TOTAL_TICKETS}")
 print(f"Simulationen: {SIMULATIONS}")
@@ -95,9 +95,22 @@ for k, v in cutoffs.items():
 
 
 #Wahrscheinlichkeiten besser darstellen in Diagramm
-plt.plot(positions, p_ticket_left)
+ZOOM_MIN = 20_000
+ZOOM_MAX = 50_000
+
+mask = (positions >= ZOOM_MIN) & (positions <= ZOOM_MAX)
+
+plt.figure(figsize=(9, 5))
+plt.plot(positions[mask], p_ticket_left[mask], linewidth=2)
+
+for p in [0.5, 0.1, 0.05]:
+    cutoff = positions[np.argmax(p_ticket_left < p)]
+    plt.axhline(p, linestyle="--", alpha=0.6)
+    plt.axvline(cutoff, linestyle=":", alpha=0.6)
+
 plt.xlabel("Queue-Position")
 plt.ylabel("P(Ticket verfügbar)")
-plt.title("Wahrscheinlichkeit, dass noch Tickets verfügbar sind")
-plt.grid (True)
-plt.savefig("plot.png")
+plt.title("Bereich in dem die Ticketverfügbarkeit unwahrscheinlicher wird")
+plt.grid(True)
+plt.savefig("plot_zoom.png")
+plt.show()
