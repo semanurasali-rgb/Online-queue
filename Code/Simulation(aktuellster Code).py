@@ -25,25 +25,25 @@ weights=1/np.sqrt(ticket_value)
 weights/= weights.sum()
 
 
-#Einzelne Simulation - Vektorisiert
-def run_single_simulation_vectorized(): 
-    # Zufällige Nachfrage für alles Personen generieren
-    demands = rng.choice(ticket_value, size=QUEUE_SIZE, p=weights)
+#Einzelne Simulation
+def run_single_simulation():
+    tickets_left=TOTAL_TICKETS
+    for person in range(QUEUE_SIZE):
+        #entscheidet ob Person Tickets kauft
+        if rng.random()<P_ZERO:
+            demand=0
+        else:
+            demand=rng.choice(ticket_value, p=weights)
+        tickets_left -=demand
+        #Tickets sind aufgebraucht
+        if tickets_left<0:
+            #letzte Person die noch ein Ticket bekommt
+            return person
+    return QUEUE_SIZE
 
-    #5% Chance, dass jemand nicht kauft
-    zeros = rng.random(size=QUEUE_SIZE) < P_ZERO
-    demands [zeros] = 0
 
-    # Kumlierte Summe berechnen 
-    cumsum = np.cumsum(demands)
-
-    #Position finden, an der Tickets alle weg sind 
-    sellout_idx = np.searchsorted(cumsum, TOTAL_TICKETS, side='right')
-    return sellout_idx
-
-
-#Monte-Carlo-Simulation (vektorisiert pro Simulation)
-sellout_positions=np.array([run_single_simulation_vectorized()for _ in range(SIMULATIONS)])
+#Monte-Carlo-Simulation
+sellout_positions=np.array([run_single_simulation()for _ in range(SIMULATIONS)])
 
 
 #Wahrscheinlichkeit pro Queue-Position mit Schrittweite von 100
@@ -76,9 +76,8 @@ important_rows = table[table["Queue-Position"].isin(important_positions)]
 levels = [0.5, 0.25, 0.15, 0.10, 0.05, 0.01]
 cutoffs = {f"{int(p*100)}% Chance": positions[np.argmax(p_ticket_left < p)]for p in levels}
 
-
-#Ausgabe
-print("\nSimulation abgeschlossen")
+#Ergebnisse Ausgeben
+print("\n Simulation abgeschlossen")
 print(f"Stadion_Tickets: {TOTAL_TICKETS}")
 print(f"Simulationen: {SIMULATIONS}")
 print(f"Queue-Größe: {QUEUE_SIZE}")
@@ -95,25 +94,23 @@ for k, v in cutoffs.items():
     print(f"{k:>10} ca. {v:,}")
 
 
-#Tabelle 
-print(table)
-#davon nur die wichtigen Zahlen
-print("\nWichtige Queue-Positionen:")
-print(important_rows)
-
-
 #Wahrscheinlichkeiten besser darstellen in Diagramm
-plt.figure(figuresize=(10,6))
-plt.plot(positions/1000, p_ticket_left, label="P(Tickt verfügbar)")
-for label, v in cutoffs.items():
-    if 30_000 <= v <= 40_000:
-        plt.axvline(v/ 1000, color='red', linestyle='--', alpha=0.7)
-        plt.text(v / 1000 +0.2, 0.05, label, rotation=90, color='red', fontsize=8)
-plt.xlabel("Queue-Position (in Tausend)")
-plt.ylabel("P(Ticket verfügbar)")
-plt.title("Wahrscheinlichkeit, dass noch Tickets verfügbar sind")
-plt.grid (True)
-plt.savefig("plot.png")
-plt.show()
+ZOOM_MIN = 20_000
+ZOOM_MAX = 50_000
 
-print("Simulation komplett abgeschlossen")
+mask = (positions >= ZOOM_MIN) & (positions <= ZOOM_MAX)
+
+plt.figure(figsize=(9, 5))
+plt.plot(positions[mask], p_ticket_left[mask], linewidth=2)
+
+for p in [0.5, 0.1, 0.05]:
+    cutoff = positions[np.argmax(p_ticket_left < p)]
+    plt.axhline(p, linestyle="--", alpha=0.6)
+    plt.axvline(cutoff, linestyle=":", alpha=0.6)
+
+plt.xlabel("Queue-Position")
+plt.ylabel("P(Ticket verfügbar)")
+plt.title("Bereich in dem die Ticketverfügbarkeit unwahrscheinlicher wird")
+plt.grid(True)
+plt.savefig("plot_zoom.png")
+plt.show()
