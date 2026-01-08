@@ -30,3 +30,5 @@ source venv/bin/Activate # On Windows: venv\Scripts\activate
 
 ### 3. Install required packages:
 pip install numpy pandas matplotlib
+
+### 4. And change our parameters to the ones, that you want to work with.
